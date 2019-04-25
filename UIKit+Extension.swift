@@ -1,6 +1,5 @@
 //
 //  UIKit+Extension.swift
-//  SwiftDemo
 //
 //  Created by Yi Zhang on 2019/1/12.
 //  Copyright © 2019 Yi Zhang. All rights reserved.
