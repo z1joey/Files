@@ -8,6 +8,7 @@
 import UIKit
 
 // MARK: 通过Storyboard加载
+
 protocol StoryboardLoadable {}
 extension StoryboardLoadable where Self: UIViewController
 {
@@ -16,7 +17,9 @@ extension StoryboardLoadable where Self: UIViewController
     }
 }
 
+
 // MARK: 通过xib文件加载
+
 protocol NibLoadable {}
 extension NibLoadable
 {
@@ -25,7 +28,9 @@ extension NibLoadable
     }
 }
 
+
 // MARK: Tableview和Cell注册
+
 protocol RegisterCellFromNib{}
 extension RegisterCellFromNib
 {
@@ -48,7 +53,9 @@ extension UITableView
     }
 }
 
+
 // MARK: CGRect和CGPoint扩展
+
 extension CGRect
 {
     var leftHalf: CGRect {
@@ -79,4 +86,62 @@ extension CGPoint
     func offsetBy(dx: CGFloat, dy:CGFloat) -> CGPoint {
         return CGPoint(x: x+dx, y: y+dy)
     }
+}
+
+
+// MARK: UIView
+
+extension UIView {
+  func addSubview(
+    _ subview: UIView,
+    constrainedTo anchorsView: UIView, widthAnchorView: UIView? = nil,
+    multiplier: CGFloat = 1
+  ) {
+    addSubview(subview)
+    subview.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      subview.centerXAnchor.constraint(equalTo: anchorsView.centerXAnchor),
+      subview.centerYAnchor.constraint(equalTo: anchorsView.centerYAnchor),
+      subview.widthAnchor.constraint(
+        equalTo: (widthAnchorView ?? anchorsView).widthAnchor,
+        multiplier: multiplier
+      ),
+      subview.heightAnchor.constraint(
+        equalTo: anchorsView.heightAnchor,
+        multiplier: multiplier
+      )
+    ])
+  }
+
+  func animateIn(handleCompletion: ( () -> Void )? = nil) {
+    transform = CGAffineTransform.identity.scaledBy(x: 0.5, y: 0.5)
+    alpha = 0
+    isHidden = false
+
+    UIView.animate(
+      withDuration: 0.5,
+      delay: 0,
+      usingSpringWithDamping: 0.4,
+      initialSpringVelocity: 0.5,
+      animations: {
+        self.alpha = 1
+        self.transform = .identity
+      },
+      completion: handleCompletion.map { handleCompletion in
+        { _ in handleCompletion() }
+      }
+    )
+  }
+
+  func roundCorners() {
+    layer.cornerRadius = {
+      let cardRadius = bounds.maxX / 6
+      switch self {
+      case is CardView, is CardSuperview:
+        return cardRadius
+      default:
+        return cardRadius / 3
+      }
+    } ()
+  }
 }
